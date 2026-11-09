@@ -34,7 +34,7 @@ export function App() {
   return (
     <ThemeProvider theme={gatsBioTheme}>
       <CssBaseline />
-      <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', bgcolor: '#FFFFFF' }}>
+      <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', bgcolor: '#FFFFFF', width: '100%', maxWidth: '100%', overflowX: 'hidden' }}>
         {/* Sticky Public Header */}
         <PublicNavbar
           currentRoute={currentRoute}

@@ -1,61 +1,119 @@
 import React from 'react';
 import { Box, Typography, Paper, Chip } from '@mui/material';
-import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
+import MenuBookIcon from '@mui/icons-material/MenuBook';
+import StorageIcon from '@mui/icons-material/Storage';
+import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
+import DeviceHubIcon from '@mui/icons-material/DeviceHub';
+
+interface ComparisonRow {
+  category: string;
+  icon: React.ReactNode;
+  iconColor: string;
+  problemTitle: string;
+  problemDesc: string;
+  solutionTitle: string;
+  solutionDesc: string;
+  metric: string;
+}
 
 export const ProblemSolutionMatrix: React.FC = () => {
-  const comparisons = [
+  const comparisons: ComparisonRow[] = [
     {
-      problem: 'Paper Notebooks & Excel Silos',
-      problemDesc: 'Handwritten protocols get lost, Excel formulas corrupt easily, and data remains trapped in personal drives.',
-      solution: 'Cloud Electronic Lab Notebook (ELN)',
-      solutionDesc: 'Version-controlled standardized SOPs, inline LaTeX chemical math, and real-time multi-scientist co-authoring.',
-      badge: 'Zero Protocol Drift',
+      category: 'PROTOCOL EXECUTION',
+      icon: <MenuBookIcon fontSize="small" />,
+      iconColor: '#0F766E',
+      problemTitle: 'Paper Notebooks & Excel Silos',
+      problemDesc:
+        'Handwritten protocols get lost, Excel formulas corrupt, and experimental IP remains trapped on personal hard drives.',
+      solutionTitle: 'Cloud Electronic Lab Notebook (ELN)',
+      solutionDesc:
+        'Standardized digital SOPs, inline LaTeX reaction math, and real-time team co-authoring with zero protocol drift.',
+      metric: 'Zero Protocol Drift',
     },
     {
-      problem: 'Lost Freezer Tubes & Expired Aliquots',
-      problemDesc: 'Unlabeled cryovials in -80°C freezers lead to repeated assays, wasted reagents, and degraded cell lines.',
-      solution: 'Barcode-Driven Multi-Tier LIMS',
-      solutionDesc: '1D/2D DataMatrix scanning, automated freeze-thaw count warnings, and coordinate mapping down to individual box slots.',
-      badge: '0% Lost Specimen Rate',
+      category: 'SAMPLE INVENTORY',
+      icon: <StorageIcon fontSize="small" />,
+      iconColor: '#1E40AF',
+      problemTitle: 'Lost Cryovials & Degraded Aliquots',
+      problemDesc:
+        'Unlabeled cryovials in -80°C freezers cause repeated assays, wasted reagents, and degraded cell lines.',
+      solutionTitle: 'Barcode-Driven Multi-Tier LIMS',
+      solutionDesc:
+        'Automated 2D DataMatrix scanning, freeze-thaw alerts, and coordinate mapping down to specific freezer rack slots.',
+      metric: '0% Lost Specimen Rate',
     },
     {
-      problem: 'Audit Panic Ahead of FDA / ISO Reviews',
-      problemDesc: 'Scrambling for weeks to reconstruct paper batch records, signatures, and calibration histories during inspections.',
-      solution: 'Continuous 21 CFR Part 11 Integrity',
-      solutionDesc: 'Automatic, immutable SHA-256 Merkle audit trails capturing every record modification with dual-factor digital signatures.',
-      badge: 'Audit-Ready 24/7/365',
+      category: 'REGULATORY COMPLIANCE',
+      icon: <VerifiedUserIcon fontSize="small" />,
+      iconColor: '#B45309',
+      problemTitle: 'Audit Panic Ahead of FDA / ISO Reviews',
+      problemDesc:
+        'Scrambling for weeks to reconstruct paper batch records, signatures, and calibration histories during inspections.',
+      solutionTitle: 'Continuous 21 CFR Part 11 Integrity',
+      solutionDesc:
+        'Automated, immutable SHA-256 Merkle audit trails capturing every record modification with dual-factor electronic signatures.',
+      metric: 'Audit-Ready 24/7/365',
     },
     {
-      problem: 'Isolated Instruments & Manual Transcription',
-      problemDesc: 'Exporting raw spectrophotometer or sequencer CSVs onto USB sticks, risking data loss and human transcription errors.',
-      solution: 'Automated Bio Data Lake & Robotics API',
-      solutionDesc: 'Native streaming ingestion for FASTQ, BAM, and plate readers, with direct export to Tecan and Hamilton liquid handlers.',
-      badge: '60% Faster Turnaround',
+      category: 'INSTRUMENT AUTOMATION',
+      icon: <DeviceHubIcon fontSize="small" />,
+      iconColor: '#7E22CE',
+      problemTitle: 'Isolated Instruments & USB Transfers',
+      problemDesc:
+        'Exporting raw plate reader CSVs onto flash drives, risking data loss, formatting corruption, and manual entry errors.',
+      solutionTitle: 'Bio Data Lake & Robotics API',
+      solutionDesc:
+        'Native streaming ingestion for plate readers and sequencers, with automated export to Hamilton and Tecan liquid handlers.',
+      metric: '60% Faster Turnaround',
     },
   ];
 
   return (
-    <Box sx={{ my: 10 }}>
+    <Box sx={{ my: { xs: 6, md: 10 } }}>
       {/* Section Header */}
-      <Box sx={{ textAlign: 'center', mb: 6 }}>
-        <Chip
-          icon={<CompareArrowsIcon sx={{ color: '#0F766E !important' }} />}
-          label="Why Modern Biotechs Switch to GatsBio"
-          sx={{ bgcolor: '#F0FDF4', color: '#0F766E', fontWeight: 700, mb: 2 }}
-        />
-        <Typography variant="h4" sx={{ fontWeight: 800, color: '#0F172A', mt: 1 }}>
-          The Shift from Fragmented Tools to an Integrated Scientific OS
+      <Box sx={{ textAlign: 'center', mb: { xs: 4, md: 6 } }}>
+        <Typography
+          variant="caption"
+          sx={{
+            color: '#0F766E',
+            fontWeight: 800,
+            letterSpacing: '1px',
+            textTransform: 'uppercase',
+            fontSize: '11px',
+            display: 'block',
+            mb: 1,
+          }}
+        >
+          The Paradigm Shift
         </Typography>
-        <Typography variant="body1" sx={{ color: '#64748B', maxWidth: 680, mx: 'auto', mt: 1.5 }}>
-          Traditional life sciences workflows are hindered by manual transcription, lost freezer samples, and regulatory vulnerabilities.
-          Here is how GatsBio transforms daily research operations.
+        <Typography
+          variant="h3"
+          sx={{
+            fontSize: { xs: '22px', sm: '28px', md: '34px' },
+            fontWeight: 800,
+            color: '#0F172A',
+            letterSpacing: '-0.02em',
+            mb: 1.5,
+          }}
+        >
+          From Fragmented Tools to a Unified Scientific OS
+        </Typography>
+        <Typography
+          variant="body1"
+          sx={{
+            color: '#64748B',
+            maxWidth: 640,
+            mx: 'auto',
+            fontSize: { xs: '13.5px', sm: '15px' },
+            lineHeight: 1.55,
+          }}
+        >
+          Traditional life sciences workflows lose thousands of hours to manual transcription, lost freezer samples, and regulatory vulnerabilities. See how GatsBio transforms operations.
         </Typography>
       </Box>
 
-      {/* Comparison Grid */}
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+      {/* Comparison Rows */}
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: { xs: 2.5, md: 3 } }}>
         {comparisons.map((item, index) => (
           <Paper
             key={index}
@@ -64,65 +122,171 @@ export const ProblemSolutionMatrix: React.FC = () => {
               borderRadius: 3.5,
               border: '1px solid #E2E8F0',
               overflow: 'hidden',
-              display: 'grid',
-              gridTemplateColumns: { xs: '1fr', md: '1fr 1.2fr' },
-              transition: 'all 0.2s',
+              bgcolor: '#FFFFFF',
+              boxShadow: '0 2px 8px -2px rgba(15, 23, 42, 0.04)',
+              transition: 'all 0.25s ease',
               '&:hover': {
                 borderColor: '#CBD5E1',
-                boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.05)',
+                boxShadow: '0 8px 24px -4px rgba(15, 23, 42, 0.08)',
+                transform: 'translateY(-2px)',
               },
             }}
           >
-            {/* The Old Way (Problem) */}
+            {/* Top Domain Category Header */}
             <Box
               sx={{
-                p: { xs: 3, md: 4 },
-                bgcolor: '#FFF5F5',
-                borderRight: { md: '1px solid #FEE2E2' },
-                borderBottom: { xs: '1px solid #FEE2E2', md: 'none' },
+                px: { xs: 2.5, sm: 3.5 },
+                py: 1,
+                bgcolor: '#F8FAFC',
+                borderBottom: '1px solid #E2E8F0',
                 display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
+                alignItems: 'center',
+                justifyContent: 'space-between',
               }}
             >
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5 }}>
-                <CancelOutlinedIcon sx={{ color: '#DC2626', fontSize: 24 }} />
-                <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#991B1B' }}>
-                  {item.problem}
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Box sx={{ display: 'flex', color: item.iconColor }}>{item.icon}</Box>
+                <Typography sx={{ fontWeight: 800, fontSize: '11px', color: '#64748B', letterSpacing: '0.6px' }}>
+                  {item.category}
                 </Typography>
               </Box>
-              <Typography variant="body2" sx={{ color: '#7F1D1D', lineHeight: 1.6 }}>
-                {item.problemDesc}
-              </Typography>
+
+              <Chip
+                label={item.metric}
+                size="small"
+                sx={{
+                  bgcolor: '#ECFDF5',
+                  color: '#065F46',
+                  fontWeight: 700,
+                  fontSize: '11px',
+                  height: 22,
+                  border: '1px solid #A7F3D0',
+                }}
+              />
             </Box>
 
-            {/* The GatsBio Way (Solution) */}
+            {/* Split Comparison Columns */}
             <Box
               sx={{
-                p: { xs: 3, md: 4 },
-                bgcolor: '#FFFFFF',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                position: 'relative',
+                display: 'grid',
+                gridTemplateColumns: { xs: '1fr', md: '1fr 1.15fr' },
               }}
             >
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5, flexWrap: 'wrap', gap: 1 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                  <CheckCircleIcon sx={{ color: '#10B981', fontSize: 24 }} />
-                  <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#0F172A' }}>
-                    {item.solution}
+              {/* Left Column: The Legacy Friction */}
+              <Box
+                sx={{
+                  p: { xs: 2.5, sm: 3.5 },
+                  bgcolor: '#FAFAFA',
+                  borderRight: { md: '1px solid #E2E8F0' },
+                  borderBottom: { xs: '1px solid #E2E8F0', md: 'none' },
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                }}
+              >
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                  <Box
+                    sx={{
+                      width: 18,
+                      height: 18,
+                      borderRadius: '50%',
+                      bgcolor: '#FEE2E2',
+                      color: '#DC2626',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '11px',
+                      fontWeight: 800,
+                      flexShrink: 0,
+                    }}
+                  >
+                    ✕
+                  </Box>
+                  <Typography variant="caption" sx={{ color: '#DC2626', fontWeight: 800, letterSpacing: '0.5px' }}>
+                    THE OLD WAY
                   </Typography>
                 </Box>
-                <Chip
-                  size="small"
-                  label={item.badge}
-                  sx={{ bgcolor: '#ECFDF5', color: '#065F46', fontWeight: 700, fontSize: '11px' }}
-                />
+
+                <Typography
+                  variant="subtitle1"
+                  sx={{
+                    fontWeight: 800,
+                    color: '#1E293B',
+                    fontSize: { xs: '14.5px', sm: '15.5px' },
+                    mb: 0.8,
+                  }}
+                >
+                  {item.problemTitle}
+                </Typography>
+
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: '#64748B',
+                    lineHeight: 1.55,
+                    fontSize: { xs: '12.5px', sm: '13.5px' },
+                  }}
+                >
+                  {item.problemDesc}
+                </Typography>
               </Box>
-              <Typography variant="body2" sx={{ color: '#475569', lineHeight: 1.6 }}>
-                {item.solutionDesc}
-              </Typography>
+
+              {/* Right Column: The GatsBio Solution */}
+              <Box
+                sx={{
+                  p: { xs: 2.5, sm: 3.5 },
+                  bgcolor: '#FFFFFF',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                }}
+              >
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                  <Box
+                    sx={{
+                      width: 18,
+                      height: 18,
+                      borderRadius: '50%',
+                      bgcolor: '#ECFDF5',
+                      color: '#10B981',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '11px',
+                      fontWeight: 800,
+                      flexShrink: 0,
+                    }}
+                  >
+                    ✓
+                  </Box>
+                  <Typography variant="caption" sx={{ color: '#0F766E', fontWeight: 800, letterSpacing: '0.5px' }}>
+                    WITH GATSBIO
+                  </Typography>
+                </Box>
+
+                <Typography
+                  variant="subtitle1"
+                  sx={{
+                    fontWeight: 800,
+                    color: '#0F172A',
+                    fontSize: { xs: '14.5px', sm: '15.5px' },
+                    mb: 0.8,
+                  }}
+                >
+                  {item.solutionTitle}
+                </Typography>
+
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: '#334155',
+                    lineHeight: 1.55,
+                    fontSize: { xs: '12.5px', sm: '13.5px' },
+                  }}
+                >
+                  {item.solutionDesc}
+                </Typography>
+              </Box>
             </Box>
           </Paper>
         ))}

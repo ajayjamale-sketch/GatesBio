@@ -37,13 +37,16 @@
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 }
 
-* {
+*, *::before, *::after {
   box-sizing: border-box;
 }
 
-body {
+html, body {
   margin: 0;
   padding: 0;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
   font-family: var(--font-sans);
   color: var(--slate-900);
   background-color: #ffffff;
@@ -53,6 +56,8 @@ body {
 
 #root {
   width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -74,14 +79,22 @@ body {
   background: var(--slate-400);
 }
 
-/* Common Layout Utilities */
+/* Responsive Container */
 .container-custom {
   width: 100%;
   max-width: 1280px;
   margin-left: auto;
   margin-right: auto;
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  box-sizing: border-box;
+}
+
+@media (min-width: 640px) {
+  .container-custom {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
 }
 
 .glass-panel {

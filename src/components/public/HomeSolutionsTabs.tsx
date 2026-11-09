@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Box, Typography, Paper, Button, Chip } from '@mui/material';
 import BiotechIcon from '@mui/icons-material/Biotech';
 import SchoolIcon from '@mui/icons-material/School';
@@ -12,204 +12,313 @@ interface HomeSolutionsTabsProps {
   onNavigateSolutions: () => void;
 }
 
+interface SolutionCard {
+  id: string;
+  category: string;
+  icon: React.ReactNode;
+  iconColor: string;
+  headline: string;
+  benefits: string[];
+  impactBadge: string;
+  imageUrl: string;
+}
+
 export const HomeSolutionsTabs: React.FC<HomeSolutionsTabsProps> = ({
   onOpenDemo,
   onNavigateSolutions,
 }) => {
-  const [activeTab, setActiveTab] = useState<'biopharma' | 'academia' | 'cro' | 'diagnostics'>('biopharma');
-
-  const tabs = [
+  const solutions: SolutionCard[] = [
     {
       id: 'biopharma',
-      label: 'Biopharma Therapeutics',
+      category: 'Biopharma & Therapeutics',
       icon: <BiotechIcon fontSize="small" />,
-      tag: 'Preclinical Lead Discovery to IND Filing',
-      title: 'Accelerate Screening Assays While Protecting Proprietary IP',
-      desc: 'Link molecular target validation directly to 21 CFR Part 11 compliant batch records. Automate sgRNA selection and CRISPR off-target analysis with our embedded AI intelligence engine.',
-      metrics: [
-        '60% reduction in assay turnaround times',
-        'Cryptographic audit trails ready for FDA IND submissions',
-        'Direct multi-omics linkage (FASTQ, BAM, Proteomics)',
+      iconColor: '#1E40AF',
+      headline: 'Bring New Treatments to Patients Faster',
+      benefits: [
+        'Save 8+ hours per researcher every week by cutting manual data entry',
+        'Keep proprietary drug formulas and patent documentation fully protected',
       ],
-      impactNumber: '8.4 hrs',
-      impactLabel: 'saved per researcher / week',
+      impactBadge: '8.4 Hrs Saved / Wk',
+      imageUrl: '/images/solution-biopharma.jpg',
     },
     {
-      id: 'academia',
-      label: 'Academic Research Labs',
+      id: 'academic',
+      category: 'Universities & Research Labs',
       icon: <SchoolIcon fontSize="small" />,
-      tag: 'Multi-Lab Consortia & Grant Governance',
-      title: 'Institutional Memory That Never Leaves When Postdocs Graduate',
-      desc: 'Standardize protocol libraries and preserve experimental procedures across rotating students and postdocs. Link grant codes directly to reagent consumption and core instrument billing.',
-      metrics: [
-        '100% preservation of lab protocols and SOP versions',
-        'Real-time grant funding burndown and reagent burn rates',
-        'Integrated DOI citation generation for paper submissions',
+      iconColor: '#0F766E',
+      headline: 'Keep Lab Knowledge Safe When Students Graduate',
+      benefits: [
+        'Preserve all laboratory protocols permanently across rotating lab cohorts',
+        'Track grant budgets and supplies in real time without messy spreadsheets',
       ],
-      impactNumber: '0%',
-      impactLabel: 'institutional protocol loss',
+      impactBadge: '100% Protocols Retained',
+      imageUrl: '/images/solution-academic.jpg',
     },
     {
       id: 'cro',
-      label: 'Contract Research (CROs)',
+      category: 'Contract Research Labs (CROs)',
       icon: <HubIcon fontSize="small" />,
-      tag: 'Multi-Sponsor Isolation & Batch Testing',
-      title: 'Strict Sponsor Sandboxing with Automated Certificate of Analysis',
-      desc: 'Deliver client study data 4x faster. Enforce airtight cryptographic data isolation between competitive pharmaceutical sponsors while running high-throughput 384-well batches.',
-      metrics: [
-        'Zero cross-sponsor data contamination via tenant boundaries',
-        'Automated one-click Certificate of Analysis (CoA) PDF exports',
-        'Direct read-only client audit portal for sponsor QA audits',
+      iconColor: '#7E22CE',
+      headline: 'Deliver Study Results to Clients in Hours, Not Weeks',
+      benefits: [
+        'Send finished test reports to sponsors 4x faster with automated summaries',
+        'Keep each client’s proprietary study data strictly isolated and secure',
       ],
-      impactNumber: '4x',
-      impactLabel: 'faster client report turnaround',
+      impactBadge: '4x Faster Client Reports',
+      imageUrl: '/images/solution-cro.jpg',
     },
     {
       id: 'diagnostics',
-      label: 'Clinical Diagnostics',
+      category: 'Clinical Testing & Diagnostics',
       icon: <ScienceIcon fontSize="small" />,
-      tag: 'CLIA / CAP High-Volume Accessioning',
-      title: 'Zero-Error Specimen Accessioning at Massive Diagnostic Scale',
-      desc: 'Process thousands of patient bio-specimens with automated barcode validation. Enforce HIPAA security rules with AES-256 cloud encryption and direct laboratory instrument interfaces.',
-      metrics: [
-        'Sub-second handheld barcode scan accessioning',
-        'Automated aliquot tube label printing with 2D DataMatrix verification',
-        'HIPAA Business Associate Agreement (BAA) with audit logs',
+      iconColor: '#B45309',
+      headline: 'Zero-Error Patient Sample Tracking at Any Scale',
+      benefits: [
+        'Prevent sample mix-ups with instant 2D barcode accessioning',
+        'Full patient privacy compliance to keep all medical records secure',
       ],
-      impactNumber: '0',
-      impactLabel: 'lost specimens across 1.4M+ logged vials',
+      impactBadge: 'Zero Lost Samples',
+      imageUrl: '/images/solution-diagnostics.jpg',
     },
-  ] as const;
-
-  const current = tabs.find((t) => t.id === activeTab) || tabs[0];
+  ];
 
   return (
-    <Box sx={{ my: 10 }}>
-      {/* Header */}
-      <Box sx={{ textAlign: 'center', mb: 6 }}>
-        <Chip
-          label="Purpose-Built Across Life Sciences"
-          sx={{ bgcolor: '#EFF6FF', color: '#1E40AF', fontWeight: 700, mb: 2 }}
-        />
-        <Typography variant="h4" sx={{ fontWeight: 800, color: '#0F172A', mt: 1 }}>
-          Tailored for Every Stage of the Scientific Journey
-        </Typography>
-        <Typography variant="body1" sx={{ color: '#64748B', maxWidth: 640, mx: 'auto', mt: 1.5 }}>
-          Whether you are a venture-backed biopharma spinout, an academic medical center, or a high-throughput CRO,
-          GatsBio adapts to your specific operational workflows.
-        </Typography>
-      </Box>
-
-      {/* Tabs */}
-      <Box sx={{ display: 'flex', justifyContent: 'center', mb: 5, flexWrap: 'wrap', gap: 1.5 }}>
-        {tabs.map((tab) => {
-          const isActive = activeTab === tab.id;
-          return (
-            <Button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              startIcon={tab.icon}
-              sx={{
-                px: 2.5,
-                py: 1.2,
-                borderRadius: 2.5,
-                fontWeight: 700,
-                fontSize: '14px',
-                bgcolor: isActive ? '#1E40AF' : '#F1F5F9',
-                color: isActive ? '#FFFFFF' : '#475569',
-                boxShadow: isActive ? '0 4px 6px -1px rgba(30, 64, 175, 0.25)' : 'none',
-                '&:hover': {
-                  bgcolor: isActive ? '#1E3A8A' : '#E2E8F0',
-                },
-              }}
-            >
-              {tab.label}
-            </Button>
-          );
-        })}
-      </Box>
-
-      {/* Active Tab Showcase Card */}
-      <Paper
-        elevation={0}
-        sx={{
-          p: { xs: 3.5, md: 6 },
-          borderRadius: 4,
-          border: '1px solid #E2E8F0',
-          bgcolor: '#FFFFFF',
-          display: 'grid',
-          gridTemplateColumns: { xs: '1fr', lg: '1.4fr 1fr' },
-          gap: 5,
-          alignItems: 'center',
-          boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.04)',
-        }}
-      >
-        <div>
-          <Chip label={current.tag} sx={{ bgcolor: '#EFF6FF', color: '#1E40AF', fontWeight: 700, mb: 2 }} />
-          <Typography variant="h5" sx={{ fontWeight: 800, color: '#0F172A', mb: 2, fontSize: { xs: '20px', md: '26px' } }}>
-            {current.title}
-          </Typography>
-          <Typography variant="body1" sx={{ color: '#475569', lineHeight: 1.6, mb: 4 }}>
-            {current.desc}
-          </Typography>
-
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.8, mb: 4 }}>
-            {current.metrics.map((m, idx) => (
-              <Box key={idx} sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5 }}>
-                <CheckCircleIcon sx={{ color: '#10B981', fontSize: 20, mt: '2px' }} />
-                <Typography variant="body2" sx={{ color: '#334155', fontWeight: 600 }}>
-                  {m}
-                </Typography>
-              </Box>
-            ))}
-          </Box>
-
-          <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-            <Button
-              variant="contained"
-              onClick={onOpenDemo}
-              endIcon={<ArrowForwardIcon />}
-              sx={{ bgcolor: '#1E40AF', '&:hover': { bgcolor: '#1E3A8A' }, px: 3, py: 1.2, fontWeight: 700 }}
-            >
-              Request {current.label} Demo
-            </Button>
-            <Button
-              variant="outlined"
-              onClick={onNavigateSolutions}
-              sx={{ borderColor: '#CBD5E1', color: '#0F172A', fontWeight: 700 }}
-            >
-              Read Full Solution Brief
-            </Button>
-          </Box>
-        </div>
-
-        {/* Quantified Impact Badge Box */}
-        <Box
+    <Box sx={{ my: { xs: 6, md: 9 } }}>
+      {/* Clean Section Header */}
+      <Box sx={{ textAlign: 'center', mb: { xs: 3.5, md: 5 } }}>
+        <Typography
+          variant="caption"
           sx={{
-            p: 5,
-            bgcolor: '#F8FAFC',
-            borderRadius: 3.5,
-            border: '1px solid #E2E8F0',
-            textAlign: 'center',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
+            color: '#0F766E',
+            fontWeight: 800,
+            letterSpacing: '1px',
+            textTransform: 'uppercase',
+            fontSize: '11px',
+            display: 'block',
+            mb: 1,
           }}
         >
-          <Typography variant="overline" sx={{ color: '#0F766E', fontWeight: 800, letterSpacing: '1px' }}>
-            Documented ROI Benchmark
-          </Typography>
-          <Typography variant="h2" sx={{ fontWeight: 900, color: '#1E40AF', my: 1.5 }}>
-            {current.impactNumber}
-          </Typography>
-          <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#0F172A', mb: 1 }}>
-            {current.impactLabel}
-          </Typography>
-          <Typography variant="caption" sx={{ color: '#64748B', maxWidth: 280, mx: 'auto' }}>
-            Validated across active biotech laboratory deployments and time-motion study audits.
-          </Typography>
-        </Box>
-      </Paper>
+          Tailored Solutions
+        </Typography>
+        <Typography
+          variant="h3"
+          sx={{
+            fontSize: { xs: '22px', sm: '28px', md: '34px' },
+            fontWeight: 800,
+            color: '#0F172A',
+            letterSpacing: '-0.02em',
+            mb: 1.5,
+          }}
+        >
+          Built for the Way Your Team Works
+        </Typography>
+        <Typography
+          variant="body1"
+          sx={{
+            color: '#64748B',
+            maxWidth: 620,
+            mx: 'auto',
+            fontSize: { xs: '13.5px', sm: '15px' },
+            lineHeight: 1.55,
+          }}
+        >
+          Whether you are discovering new medicines, running a university lab, testing for clients, or processing patient diagnostics, GatsBio adapts to your specific routine.
+        </Typography>
+      </Box>
+
+      {/* Responsive 2x2 Grid Layout */}
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' },
+          gap: { xs: 2.5, sm: 3, md: 3.5 },
+          width: '100%',
+        }}
+      >
+        {solutions.map((item) => (
+          <Paper
+            key={item.id}
+            elevation={0}
+            sx={{
+              borderRadius: 3,
+              border: '1px solid #E2E8F0',
+              overflow: 'hidden',
+              bgcolor: '#FFFFFF',
+              boxShadow: '0 2px 8px -2px rgba(15, 23, 42, 0.04)',
+              display: 'flex',
+              flexDirection: 'column',
+              transition: 'transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease',
+              '&:hover': {
+                transform: 'translateY(-3px)',
+                boxShadow: '0 12px 28px -4px rgba(15, 23, 42, 0.08)',
+                borderColor: '#CBD5E1',
+                '& .card-image': {
+                  transform: 'scale(1.03)',
+                },
+              },
+            }}
+          >
+            {/* Pure Unobstructed Visual Image Header (Zero Text Overlays) */}
+            <Box
+              sx={{
+                height: { xs: 180, sm: 210, md: 230 },
+                width: '100%',
+                overflow: 'hidden',
+                position: 'relative',
+                bgcolor: '#0F172A',
+                transform: 'translateZ(0)',
+                isolation: 'isolate',
+              }}
+            >
+              <Box
+                component="img"
+                className="card-image"
+                src={item.imageUrl}
+                alt={item.headline}
+                sx={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  display: 'block',
+                  filter: 'brightness(1.02) contrast(1.02)',
+                  transition: 'transform 0.4s ease',
+                }}
+              />
+            </Box>
+
+            {/* Card Content Body */}
+            <Box
+              sx={{
+                p: { xs: 2, sm: 2.5, md: 3 },
+                display: 'flex',
+                flexDirection: 'column',
+                flex: 1,
+                justifyContent: 'space-between',
+              }}
+            >
+              <Box>
+                {/* Sector Category & ROI Metric Badges */}
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: 1,
+                    mb: 1.5,
+                    flexWrap: 'wrap',
+                  }}
+                >
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
+                    <Box sx={{ display: 'flex', color: item.iconColor }}>{item.icon}</Box>
+                    <Typography
+                      sx={{
+                        fontWeight: 800,
+                        fontSize: { xs: '11px', sm: '12px' },
+                        color: '#0F172A',
+                      }}
+                    >
+                      {item.category}
+                    </Typography>
+                  </Box>
+
+                  <Chip
+                    label={item.impactBadge}
+                    size="small"
+                    sx={{
+                      bgcolor: '#ECFDF5',
+                      color: '#065F46',
+                      fontWeight: 700,
+                      fontSize: '10.5px',
+                      height: 22,
+                      border: '1px solid #A7F3D0',
+                    }}
+                  />
+                </Box>
+
+                {/* Clear, Concise Headline */}
+                <Typography
+                  variant="h5"
+                  sx={{
+                    fontWeight: 800,
+                    color: '#0F172A',
+                    fontSize: { xs: '16px', sm: '18px' },
+                    lineHeight: 1.3,
+                    mb: 2,
+                  }}
+                >
+                  {item.headline}
+                </Typography>
+
+                {/* Key Benefits (No Redundant Description) */}
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.2, mb: 2.5 }}>
+                  {item.benefits.map((b, i) => (
+                    <Box key={i} sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
+                      <CheckCircleIcon sx={{ color: '#10B981', fontSize: 16, mt: '2px', flexShrink: 0 }} />
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          color: '#334155',
+                          fontWeight: 600,
+                          fontSize: { xs: '12.5px', sm: '13px' },
+                          lineHeight: 1.45,
+                        }}
+                      >
+                        {b}
+                      </Typography>
+                    </Box>
+                  ))}
+                </Box>
+              </Box>
+
+              {/* Action Buttons */}
+              <Box
+                sx={{
+                  pt: 2,
+                  borderTop: '1px solid #F1F5F9',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: 1.5,
+                  flexWrap: 'wrap',
+                }}
+              >
+                <Button
+                  variant="contained"
+                  size="small"
+                  onClick={onOpenDemo}
+                  endIcon={<ArrowForwardIcon sx={{ fontSize: '14px !important' }} />}
+                  sx={{
+                    bgcolor: '#1E40AF',
+                    '&:hover': { bgcolor: '#1D4ED8' },
+                    py: 0.7,
+                    px: 2,
+                    fontSize: '12px',
+                    fontWeight: 700,
+                    borderRadius: 2,
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  Schedule Demo
+                </Button>
+
+                <Button
+                  size="small"
+                  onClick={onNavigateSolutions}
+                  sx={{
+                    color: '#475569',
+                    fontSize: '12px',
+                    fontWeight: 700,
+                    whiteSpace: 'nowrap',
+                    '&:hover': { color: '#0F172A', bgcolor: 'transparent' },
+                  }}
+                >
+                  Learn More →
+                </Button>
+              </Box>
+            </Box>
+          </Paper>
+        ))}
+      </Box>
     </Box>
   );
 };

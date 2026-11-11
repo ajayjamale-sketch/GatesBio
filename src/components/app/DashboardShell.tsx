@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
+  Avatar,
   Box,
   Typography,
   IconButton,
@@ -11,7 +12,6 @@ import {
   Popover,
   Drawer,
   Button,
-  Chip,
   Tooltip,
   Divider,
 } from '@mui/material';
@@ -36,7 +36,7 @@ import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import SecurityIcon from '@mui/icons-material/Security';
 import LogoutIcon from '@mui/icons-material/Logout';
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
-import { ROLE_CONFIGS, ROLE_LIST } from '../../config/roleAccess';
+import { ROLE_CONFIGS, ROLE_LIST, getUserInitials } from '../../config/roleAccess';
 import { ORGANIZATIONS_LIST, ROLE_NOTIFICATIONS } from '../../data/roleDashboardData';
 import type { DashboardSession, UserRoleId } from '../../types/dashboard';
 
@@ -48,6 +48,7 @@ interface DashboardShellProps {
   onSearchChange: (q: string) => void;
   onSwitchRole: (roleId: UserRoleId) => void;
   onChangeOrganization: (org: string) => void;
+  onNavigateHome: () => void;
   onSignOut: () => void;
   children: React.ReactNode;
 }
@@ -61,7 +62,7 @@ const NAV_ICONS: Record<string, React.ReactNode> = {
   collaboration: <GroupsIcon fontSize="small" />,
   publications: <ArticleIcon fontSize="small" />,
   'sample-queue': <QrCodeScannerIcon fontSize="small" />,
-  'plate-runs': <GridOn fontSize="small" />,
+  'plate-runs': <GridOnIcon fontSize="small" />,
   'cryo-storage': <AcUnitIcon fontSize="small" />,
   'results-upload': <ScienceIcon fontSize="small" />,
   equipment: <DeviceHubIcon fontSize="small" />,
@@ -80,12 +81,18 @@ const NAV_ICONS: Record<string, React.ReactNode> = {
   'sop-control': <ArticleIcon fontSize="small" />,
   'capa-deviations': <DeviceHubIcon fontSize="small" />,
   'reg-reports': <FactCheckIcon fontSize="small" />,
-  'users-rbac': <AdminPanelSettingsIcon fontSize="small" />,
-  'security-sso': <SecurityIcon fontSize="small" />,
-  infrastructure: <StorageIcon fontSize="small" />,
-  'iot-gateways': <DeviceHubIcon fontSize="small" />,
-  subscriptions: <InsightsIcon fontSize="small" />,
+  users: <AdminPanelSettingsIcon fontSize="small" />,
+  organizations: <GroupsIcon fontSize="small" />,
+  security: <SecurityIcon fontSize="small" />,
+  'iot-devices': <DeviceHubIcon fontSize="small" />,
+  billing: <InsightsIcon fontSize="small" />,
 };
+
+const SIDEBAR_BLUE_THEME = {
+  accent: '#1E40AF',
+  tint: '#EFF6FF',
+  hoverTint: 'rgba(239, 246, 255, 0.65)',
+} as const;
 
 export const DashboardShell: React.FC<DashboardShellProps> = ({
   session,
@@ -95,12 +102,32 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({
   onSearchChange,
   onSwitchRole,
   onChangeOrganization,
+  onNavigateHome,
   onSignOut,
   children,
 }) => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [notifAnchor, setNotifAnchor] = useState<null | HTMLElement>(null);
+  const mainScrollRef = useRef<HTMLDivElement | null>(null);
+  const searchInputRef = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  useEffect(() => {
+    if (mainScrollRef.current) {
+      mainScrollRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [activeNavId, session.roleId]);
 
   const roleCfg = ROLE_CONFIGS[session.roleId];
   const notifications = ROLE_NOTIFICATIONS[session.roleId] || [];
@@ -117,7 +144,7 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({
       }}
     >
       <Box>
-        {/* Brand Header */}
+        {/* Brand Header (Links to Landing Page) */}
         <Box
           sx={{
             height: 64,
@@ -128,33 +155,61 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({
             borderBottom: '1px solid #E2E8F0',
           }}
         >
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25 }}>
+          <Tooltip title="Go to GatsBio landing page" placement="right">
             <Box
+              role="button"
+              tabIndex={0}
+              aria-label="Go to GatsBio landing page"
+              onClick={() => {
+                onNavigateHome();
+                if (isMobile) setMobileNavOpen(false);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  onNavigateHome();
+                  if (isMobile) setMobileNavOpen(false);
+                }
+              }}
               sx={{
-                width: 34,
-                height: 34,
-                borderRadius: 2,
-                bgcolor: roleCfg.accentColor,
-                color: '#FFFFFF',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0,
+                gap: 1.25,
+                cursor: 'pointer',
+                borderRadius: '6px',
+                p: 0.5,
+                ml: -0.5,
+                transition: 'background-color 0.15s ease',
+                '&:hover': { bgcolor: SIDEBAR_BLUE_THEME.hoverTint },
               }}
             >
-              <BiotechIcon sx={{ fontSize: 20 }} />
-            </Box>
-            {(!sidebarCollapsed || isMobile) && (
-              <Box>
-                <Typography variant="subtitle1" sx={{ fontWeight: 900, color: '#0F172A', lineHeight: 1.1 }}>
-                  Gats<span style={{ color: '#0F766E' }}>Bio</span>
-                </Typography>
-                <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 700, fontSize: '10px' }}>
-                  {roleCfg.shortLabel.toUpperCase()}
-                </Typography>
+              <Box
+                sx={{
+                  width: 34,
+                  height: 34,
+                  borderRadius: 1.5,
+                  bgcolor: SIDEBAR_BLUE_THEME.accent,
+                  color: '#FFFFFF',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                }}
+              >
+                <BiotechIcon sx={{ fontSize: 20 }} />
               </Box>
-            )}
-          </Box>
+              {(!sidebarCollapsed || isMobile) && (
+                <Box>
+                  <Typography variant="subtitle1" sx={{ fontWeight: 900, color: '#0F172A', lineHeight: 1.1 }}>
+                    Gats<span style={{ color: '#0F766E' }}>Bio</span>
+                  </Typography>
+                  <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 700, fontSize: '10px' }}>
+                    {roleCfg.shortLabel.toUpperCase()}
+                  </Typography>
+                </Box>
+              )}
+            </Box>
+          </Tooltip>
         </Box>
 
         {/* Role-Filtered Navigation Items */}
@@ -203,16 +258,16 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({
                   gap: 1.25,
                   px: sidebarCollapsed && !isMobile ? 1 : 1.5,
                   py: 1.1,
-                  borderRadius: 2,
+                  borderRadius: '6px',
                   cursor: 'pointer',
-                  bgcolor: isActive ? roleCfg.bgTint : 'transparent',
-                  color: isActive ? roleCfg.accentColor : '#334155',
-                  borderLeft: isActive ? `3px solid ${roleCfg.accentColor}` : '3px solid transparent',
+                  bgcolor: isActive ? SIDEBAR_BLUE_THEME.tint : 'transparent',
+                  color: isActive ? SIDEBAR_BLUE_THEME.accent : '#334155',
+                  borderLeft: isActive ? `3px solid ${SIDEBAR_BLUE_THEME.accent}` : '3px solid transparent',
                   fontWeight: isActive ? 800 : 600,
                   transition: 'background-color 0.15s ease, color 0.15s ease',
                   '&:hover': {
-                    bgcolor: isActive ? roleCfg.bgTint : '#F8FAFC',
-                    color: roleCfg.accentColor,
+                    bgcolor: isActive ? SIDEBAR_BLUE_THEME.tint : SIDEBAR_BLUE_THEME.hoverTint,
+                    color: SIDEBAR_BLUE_THEME.accent,
                   },
                 }}
               >
@@ -233,14 +288,6 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({
                     </Typography>
                   )}
                 </Box>
-                {(!sidebarCollapsed || isMobile) && (
-                  <Typography
-                    variant="caption"
-                    sx={{ fontSize: '10px', fontWeight: 700, color: '#94A3B8', flexShrink: 0 }}
-                  >
-                    {item.moduleRef}
-                  </Typography>
-                )}
               </Box>
             );
 
@@ -267,32 +314,44 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({
             </Typography>
           </Box>
         )}
-        <Button
-          fullWidth
-          size="small"
-          variant="outlined"
-          onClick={onSignOut}
-          startIcon={<LogoutIcon sx={{ fontSize: '16px !important' }} />}
-          sx={{
-            borderColor: '#CBD5E1',
-            color: '#0F172A',
-            fontWeight: 700,
-            minWidth: 0,
-            px: sidebarCollapsed && !isMobile ? 1 : 2,
-            '& .MuiButton-startIcon': {
-              mr: sidebarCollapsed && !isMobile ? 0 : 1,
-            },
-          }}
-        >
-          {(!sidebarCollapsed || isMobile) && 'Exit to Site'}
-        </Button>
+        <Tooltip title={sidebarCollapsed && !isMobile ? 'Logout' : ''} placement="right">
+          <Button
+            fullWidth
+            size="small"
+            variant="outlined"
+            onClick={onSignOut}
+            startIcon={<LogoutIcon sx={{ fontSize: '16px !important' }} />}
+            sx={{
+              borderColor: '#CBD5E1',
+              color: '#0F172A',
+              fontWeight: 700,
+              borderRadius: '6px',
+              minWidth: 0,
+              px: sidebarCollapsed && !isMobile ? 1 : 2,
+              '& .MuiButton-startIcon': {
+                mr: sidebarCollapsed && !isMobile ? 0 : 1,
+              },
+            }}
+          >
+            {(!sidebarCollapsed || isMobile) && 'Logout'}
+          </Button>
+        </Tooltip>
       </Box>
     </Box>
   );
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: '#F8FAFC', width: '100%' }}>
-      {/* Desktop Collapsible Sidebar */}
+    <Box
+      sx={{
+        display: 'flex',
+        minHeight: '100vh',
+        height: { lg: '100vh' },
+        overflow: { lg: 'hidden' },
+        bgcolor: '#F8FAFC',
+        width: '100%',
+      }}
+    >
+      {/* Desktop Fixed/Collapsible Sidebar */}
       <Box
         component="aside"
         sx={{
@@ -302,9 +361,8 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({
           borderRight: '1px solid #E2E8F0',
           bgcolor: '#FFFFFF',
           transition: 'width 0.2s ease',
-          position: 'sticky',
-          top: 0,
-          height: '100vh',
+          height: '100%',
+          overflowY: 'auto',
         }}
       >
         {renderSidebarContent(false)}
@@ -321,12 +379,22 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({
       </Drawer>
 
       {/* Main Content Area */}
-      <Box sx={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
+      <Box
+        sx={{
+          flex: 1,
+          minWidth: 0,
+          display: 'flex',
+          flexDirection: 'column',
+          height: { lg: '100%' },
+          overflow: { lg: 'hidden' },
+        }}
+      >
         {/* Top Workstation Header */}
         <Box
           component="header"
           sx={{
             height: 64,
+            flexShrink: 0,
             bgcolor: '#FFFFFF',
             borderBottom: '1px solid #E2E8F0',
             px: { xs: 1.5, sm: 3 },
@@ -334,7 +402,7 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({
             alignItems: 'center',
             justifyContent: 'space-between',
             gap: 1.5,
-            position: 'sticky',
+            position: { xs: 'sticky', lg: 'relative' },
             top: 0,
             zIndex: 20,
           }}
@@ -357,6 +425,7 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({
             </IconButton>
 
             <TextField
+              inputRef={searchInputRef}
               size="small"
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
@@ -412,13 +481,14 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({
               value={session.roleId}
               onChange={(e) => onSwitchRole(e.target.value as UserRoleId)}
               startAdornment={
-                <SwapHorizIcon sx={{ color: roleCfg.accentColor, fontSize: 17, mr: 0.75 }} />
+                <SwapHorizIcon sx={{ color: SIDEBAR_BLUE_THEME.accent, fontSize: 17, mr: 0.75 }} />
               }
               sx={{
-                fontSize: '12.5px',
+                maxWidth: { xs: 145, sm: 'none' },
+                fontSize: { xs: '11.5px', sm: '12.5px' },
                 fontWeight: 800,
-                bgcolor: roleCfg.bgTint,
-                color: roleCfg.accentColor,
+                bgcolor: SIDEBAR_BLUE_THEME.tint,
+                color: SIDEBAR_BLUE_THEME.accent,
                 borderRadius: 2,
                 height: 34,
                 '& .MuiOutlinedInput-notchedOutline': { borderColor: '#CBD5E1' },
@@ -440,6 +510,37 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({
                 <NotificationsNoneIcon fontSize="small" />
               </Badge>
             </IconButton>
+
+            <Tooltip title={`${session.userName} · View Profile`}>
+              <IconButton
+                size="small"
+                aria-label="Open user profile"
+                onClick={() => onSelectNav('profile')}
+                sx={{
+                  p: 0.25,
+                  borderRadius: '50%',
+                  border:
+                    activeNavId === 'profile'
+                      ? `2px solid ${SIDEBAR_BLUE_THEME.accent}`
+                      : '2px solid transparent',
+                  transition: 'border-color 0.15s ease',
+                  '&:hover': { borderColor: '#93C5FD' },
+                }}
+              >
+                <Avatar
+                  sx={{
+                    width: 32,
+                    height: 32,
+                    bgcolor: SIDEBAR_BLUE_THEME.accent,
+                    color: '#FFFFFF',
+                    fontSize: '12px',
+                    fontWeight: 800,
+                  }}
+                >
+                  {getUserInitials(session.userName)}
+                </Avatar>
+              </IconButton>
+            </Tooltip>
           </Box>
         </Box>
 
@@ -452,7 +553,7 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({
           transformOrigin={{ vertical: 'top', horizontal: 'right' }}
           slotProps={{
             paper: {
-              sx: { width: 320, p: 2, mt: 1, borderRadius: 2.5, border: '1px solid #E2E8F0' },
+              sx: { width: { xs: 'calc(100vw - 24px)', sm: 320 }, maxWidth: 320, p: 2, mt: 1, borderRadius: 2.5, border: '1px solid #E2E8F0' },
             },
           }}
         >
@@ -475,7 +576,19 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({
         </Popover>
 
         {/* Main Role Dashboard Content */}
-        <Box component="main" sx={{ flex: 1, p: { xs: 2, sm: 3, md: 3.5 } }}>
+        <Box
+          ref={mainScrollRef}
+          component="main"
+          sx={{
+            flex: 1,
+            minWidth: 0,
+            width: '100%',
+            maxWidth: '100%',
+            overflowX: 'hidden',
+            overflowY: { lg: 'auto' },
+            p: { xs: 1.5, sm: 2.5, md: 3.5 },
+          }}
+        >
           {children}
         </Box>
       </Box>

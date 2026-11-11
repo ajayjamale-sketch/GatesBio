@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -9,6 +9,8 @@ import {
   Button,
   IconButton,
   Chip,
+  MenuItem,
+  TextField,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
@@ -36,6 +38,7 @@ export const BarcodeLabelModal: React.FC<BarcodeLabelModalProps> = ({
   onPrintConfirm,
 }) => {
   const barcodeRef = useRef<SVGSVGElement | null>(null);
+  const [labelFormat, setLabelFormat] = useState<'Zebra ZPL (Code 128 + QR)' | 'Brady Cryo (DataMatrix 2D)'>('Zebra ZPL (Code 128 + QR)');
 
   useEffect(() => {
     if (open && barcodeRef.current && sampleId) {
@@ -52,13 +55,13 @@ export const BarcodeLabelModal: React.FC<BarcodeLabelModalProps> = ({
         // Ignore invalid barcode characters
       }
     }
-  }, [open, sampleId]);
+  }, [open, sampleId, labelFormat]);
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
       <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pb: 1 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <QrCodeScannerIcon sx={{ color: '#0F766E' }} />
+          <QrCodeScannerIcon sx={{ color: '#1E40AF' }} />
           <Typography variant="h6" sx={{ fontWeight: 800, color: '#0F172A' }}>
             Cryo Label Preview (ZPL)
           </Typography>
@@ -69,10 +72,23 @@ export const BarcodeLabelModal: React.FC<BarcodeLabelModalProps> = ({
       </DialogTitle>
 
       <DialogContent dividers sx={{ p: 3 }}>
+        <TextField
+          select
+          size="small"
+          fullWidth
+          label="Thermal Label Format"
+          value={labelFormat}
+          onChange={(e) => setLabelFormat(e.target.value as 'Zebra ZPL (Code 128 + QR)' | 'Brady Cryo (DataMatrix 2D)')}
+          sx={{ mb: 2, '& .MuiOutlinedInput-root': { borderRadius: '6px', fontSize: '12.5px' } }}
+        >
+          <MenuItem value="Zebra ZPL (Code 128 + QR)">Zebra ZPL (Code 128 + QR)</MenuItem>
+          <MenuItem value="Brady Cryo (DataMatrix 2D)">Brady Cryo (DataMatrix 2D + Code 128)</MenuItem>
+        </TextField>
+
         <Box
           sx={{
             p: 2.5,
-            borderRadius: 2.5,
+            borderRadius: '8px',
             border: '2px dashed #CBD5E1',
             bgcolor: '#FFFFFF',
             display: 'flex',
@@ -85,7 +101,7 @@ export const BarcodeLabelModal: React.FC<BarcodeLabelModalProps> = ({
               <Chip
                 label={sampleType}
                 size="small"
-                sx={{ bgcolor: '#F0FDFA', color: '#0F766E', fontWeight: 800, fontSize: '10px', height: 20, mb: 0.75 }}
+                sx={{ bgcolor: '#EFF6FF', color: '#1E40AF', border: '1px solid #DBEAFE', fontWeight: 800, fontSize: '10px', height: 20, mb: 0.75, borderRadius: '4px' }}
               />
               <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#0F172A', lineHeight: 1.25 }}>
                 {sampleName}
@@ -116,9 +132,9 @@ export const BarcodeLabelModal: React.FC<BarcodeLabelModalProps> = ({
             onPrintConfirm?.();
             onClose();
           }}
-          sx={{ bgcolor: '#0F766E', '&:hover': { bgcolor: '#115E59' }, fontWeight: 700 }}
+          sx={{ bgcolor: '#1E40AF', '&:hover': { bgcolor: '#1E3A8A' }, fontWeight: 700, borderRadius: '6px' }}
         >
-          Send to Zebra Printer
+          Send to {labelFormat.startsWith('Brady') ? 'Brady Printer' : 'Zebra Printer'}
         </Button>
       </DialogActions>
     </Dialog>

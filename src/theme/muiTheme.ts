@@ -62,6 +62,16 @@ export const gatsBioTheme = createTheme({
         root: {
           fontWeight: 600,
           borderRadius: 6,
+          maxWidth: '100%',
+        },
+      },
+    },
+    MuiSelect: {
+      styleOverrides: {
+        select: {
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
         },
       },
     },

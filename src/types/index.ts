@@ -3,12 +3,14 @@
 export type SampleType =
   | 'DNA'
   | 'RNA'
+  | 'Blood'
   | 'Cell Line'
   | 'Tissue'
   | 'Protein'
   | 'Serum'
   | 'Plasmid'
-  | 'Reagent';
+  | 'Reagent'
+  | 'Synthetic';
 
 export type SampleStatus =
   | 'Available'
@@ -103,6 +105,8 @@ export type PublicRoute =
   | 'compliance'
   | 'pricing'
   | 'tools'
-  | 'demo';
+  | 'demo'
+  | 'login'
+  | 'signup';
 
 export type AnyRoute = PublicRoute | AppRoute;

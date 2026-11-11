@@ -14,13 +14,15 @@ export const WorkstationSplitView: React.FC<WorkstationSplitViewProps> = ({
     <Box
       sx={{
         display: 'grid',
-        gridTemplateColumns: { xs: '1fr', lg: '1.65fr 1fr' },
+        gridTemplateColumns: { xs: 'minmax(0, 1fr)', lg: 'minmax(0, 1.65fr) minmax(0, 1fr)' },
         gap: 2.5,
         alignItems: 'start',
+        width: '100%',
+        '& > *': { minWidth: 0 },
       }}
     >
-      <Box sx={{ minWidth: 0 }}>{primary}</Box>
-      <Box sx={{ minWidth: 0 }}>{inspector}</Box>
+      <Box sx={{ minWidth: 0, width: '100%' }}>{primary}</Box>
+      <Box sx={{ minWidth: 0, width: '100%' }}>{inspector}</Box>
     </Box>
   );
 };

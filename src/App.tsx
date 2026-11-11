@@ -1,25 +1,19 @@
 import { useState, useEffect } from 'react';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import {
-  Box,
-  Snackbar,
-  Alert,
-  Paper,
-  Typography,
-  Chip,
-  Button,
-  Divider,
-} from '@mui/material';
-import BiotechIcon from '@mui/icons-material/Biotech';
-import LogoutIcon from '@mui/icons-material/Logout';
-import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import { Box, Snackbar, Alert } from '@mui/material';
 import { gatsBioTheme } from './theme/muiTheme';
 import { PublicNavbar } from './components/public/PublicNavbar';
 import { PublicFooter } from './components/public/PublicFooter';
 import { DemoBookingModal } from './components/public/DemoBookingModal';
-import { AuthModal } from './components/public/AuthModal';
+import { DashboardShell } from './components/app/DashboardShell';
+import { ResearchScientistDashboard } from './pages/app/ResearchScientistDashboard';
+import { LabTechnicianDashboard } from './pages/app/LabTechnicianDashboard';
+import { ClinicalCoordinatorDashboard } from './pages/app/ClinicalCoordinatorDashboard';
+import { BiotechAdminDashboard } from './pages/app/BiotechAdminDashboard';
+import { ComplianceOfficerDashboard } from './pages/app/ComplianceOfficerDashboard';
+import { SystemAdminDashboard } from './pages/app/SystemAdminDashboard';
+import { UserProfilePage } from './pages/app/UserProfilePage';
 import { HomePage } from './pages/public/HomePage';
 import { PlatformPage } from './pages/public/PlatformPage';
 import { SolutionsPage } from './pages/public/SolutionsPage';
@@ -27,9 +21,10 @@ import { CompliancePage } from './pages/public/CompliancePage';
 import { PricingPage } from './pages/public/PricingPage';
 import { ToolsPage } from './pages/public/ToolsPage';
 import { ResourcesPage } from './pages/public/ResourcesPage';
+import { LoginPage } from './pages/public/LoginPage';
+import { SignupPage } from './pages/public/SignupPage';
 import {
   ROLE_CONFIGS,
-  ROLE_LIST,
   createDefaultSessionForRole,
   getRoleByAppRoute,
 } from './config/roleAccess';
@@ -52,6 +47,8 @@ const ROUTE_PATHS: Record<AnyRoute, string> = {
   pricing: '/pricing',
   tools: '/tools',
   demo: '/demo',
+  login: '/login',
+  signup: '/signup',
   'app-scientist': '/app/scientist',
   'app-technician': '/app/technician',
   'app-clinical': '/app/clinical',
@@ -62,6 +59,8 @@ const ROUTE_PATHS: Record<AnyRoute, string> = {
 
 const ROUTE_ALIASES: Record<string, AnyRoute> = {
   '/solutions': 'tailored-solutions',
+  '/signin': 'login',
+  '/register': 'signup',
   '/app': 'app-scientist',
   '/app/dashboard': 'app-scientist',
 };
@@ -109,8 +108,16 @@ export function App() {
     return stored;
   });
   const [demoModalOpen, setDemoModalOpen] = useState(false);
-  const [authModalOpen, setAuthModalOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [activeNavId, setActiveNavId] = useState<string>(() => {
+    const initialRoute = getRouteFromPathname(window.location.pathname);
+    if (isAppRoute(initialRoute)) {
+      const cfg = getRoleByAppRoute(initialRoute);
+      if (cfg && cfg.navItems.length > 0) return cfg.navItems[0].id;
+    }
+    return 'overview';
+  });
+  const [workspaceSearch, setWorkspaceSearch] = useState('');
 
   useEffect(() => {
     if (activeSession) {
@@ -143,6 +150,10 @@ export function App() {
               ? prev
               : createDefaultSessionForRole(roleCfg.roleId)
           );
+          if (roleCfg.navItems.length > 0) {
+            setActiveNavId(roleCfg.navItems[0].id);
+          }
+          setWorkspaceSearch('');
         }
       }
     };
@@ -150,7 +161,7 @@ export function App() {
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
-  const handleNavigate = (route: string) => {
+  const handleNavigate = (route: string, initialNavId?: string) => {
     const targetRoute: AnyRoute =
       route === 'solutions' ? 'tailored-solutions' : (route as AnyRoute);
     const targetPath = ROUTE_PATHS[targetRoute] || '/';
@@ -165,8 +176,14 @@ export function App() {
             ? prev
             : createDefaultSessionForRole(roleCfg.roleId)
         );
+        if (initialNavId) {
+          setActiveNavId(initialNavId);
+        } else if (roleCfg.navItems.length > 0) {
+          setActiveNavId(roleCfg.navItems[0].id);
+        }
       }
     }
+    setWorkspaceSearch('');
     setCurrentRoute(targetRoute);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -174,7 +191,6 @@ export function App() {
   const handleLoginSuccess = (session: DashboardSession) => {
     const roleCfg = ROLE_CONFIGS[session.roleId];
     setActiveSession(session);
-    setAuthModalOpen(false);
     handleNavigate(roleCfg.routeKey);
     setToastMessage(
       `Signed in as ${session.userName} (${session.roleTitle}).`
@@ -187,6 +203,37 @@ export function App() {
     setActiveSession(nextSession);
     handleNavigate(roleCfg.routeKey);
     setToastMessage(`Switched workstation role to ${roleCfg.roleTitle}.`);
+  };
+
+  const handleChangeOrganization = (organization: string) => {
+    setActiveSession((prev) => (prev ? { ...prev, organization } : prev));
+    setToastMessage(`Active organization switched to ${organization}.`);
+  };
+
+  const handleUpdateSession = (updates: Partial<DashboardSession>) => {
+    setActiveSession((prev) => {
+      const base = prev ?? activeSessionForView;
+      return base ? { ...base, ...updates } : prev;
+    });
+    setToastMessage('Profile details updated.');
+  };
+
+  const handleGoToDashboard = () => {
+    if (!activeSession) {
+      handleNavigate('login');
+      return;
+    }
+    const roleCfg = ROLE_CONFIGS[activeSession.roleId];
+    handleNavigate(roleCfg.routeKey);
+  };
+
+  const handleOpenProfile = () => {
+    if (!activeSession) {
+      handleNavigate('login');
+      return;
+    }
+    const roleCfg = ROLE_CONFIGS[activeSession.roleId];
+    handleNavigate(roleCfg.routeKey, 'profile');
   };
 
   const handleSignOut = () => {
@@ -214,214 +261,97 @@ export function App() {
           bgcolor: '#FFFFFF',
           width: '100%',
           maxWidth: '100%',
-          overflowX: 'hidden',
+          overflowX: 'clip',
         }}
       >
         {activeAppRole && activeSessionForView ? (
-          /* =====================================================================
-             PHASE 1 AUTHENTICATED ROLE ROUTING SHELL (Upgraded in Phases 2–5)
-             ===================================================================== */
-          <Box sx={{ minHeight: '100vh', bgcolor: '#F8FAFC', display: 'flex', flexDirection: 'column' }}>
-            {/* Top Bar */}
-            <Box
-              component="header"
-              sx={{
-                height: 64,
-                bgcolor: '#FFFFFF',
-                borderBottom: '1px solid #E2E8F0',
-                px: { xs: 2, sm: 4 },
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                gap: 2,
-              }}
-            >
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                <Box
-                  sx={{
-                    width: 34,
-                    height: 34,
-                    borderRadius: 2,
-                    bgcolor: '#1E40AF',
-                    color: '#FFFFFF',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <BiotechIcon sx={{ fontSize: 20 }} />
-                </Box>
-                <Box>
-                  <Typography variant="subtitle1" sx={{ fontWeight: 900, color: '#0F172A', lineHeight: 1.1 }}>
-                    Gats<span style={{ color: '#0F766E' }}>Bio</span> Workstation
-                  </Typography>
-                  <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 600 }}>
-                    {activeSessionForView.organization} · {activeSessionForView.department}
-                  </Typography>
-                </Box>
-              </Box>
-
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                <Chip
-                  icon={<VerifiedUserIcon sx={{ fontSize: '15px !important', color: '#059669 !important' }} />}
-                  label={`${activeSessionForView.userName} · ${activeAppRole.shortLabel}`}
-                  size="small"
-                  sx={{
-                    display: { xs: 'none', sm: 'inline-flex' },
-                    bgcolor: '#ECFDF5',
-                    color: '#065F46',
-                    fontWeight: 700,
-                  }}
-                />
-                <Button
-                  size="small"
-                  variant="outlined"
-                  onClick={handleSignOut}
-                  startIcon={<LogoutIcon sx={{ fontSize: '16px !important' }} />}
-                  sx={{
-                    borderColor: '#CBD5E1',
-                    color: '#0F172A',
-                    fontWeight: 700,
-                    borderRadius: 2,
-                    '&:hover': { borderColor: '#1E40AF', bgcolor: '#EFF6FF' },
-                  }}
-                >
-                  Exit to Site
-                </Button>
-              </Box>
-            </Box>
-
-            {/* Role Route Body */}
-            <Box className="container-custom" sx={{ py: { xs: 4, md: 6 }, flex: 1 }}>
-              <Paper
-                elevation={0}
-                sx={{
-                  p: { xs: 3, md: 4.5 },
-                  borderRadius: 3.5,
-                  border: '1px solid #E2E8F0',
-                  bgcolor: '#FFFFFF',
-                  mb: 3.5,
+          <DashboardShell
+            session={activeSessionForView}
+            activeNavId={activeNavId}
+            onSelectNav={setActiveNavId}
+            searchQuery={workspaceSearch}
+            onSearchChange={setWorkspaceSearch}
+            onSwitchRole={handleSwitchRole}
+            onChangeOrganization={handleChangeOrganization}
+            onNavigateHome={() => handleNavigate('home')}
+            onSignOut={handleSignOut}
+          >
+            {activeNavId === 'profile' ? (
+              <UserProfilePage
+                key={`${activeSessionForView.roleId}-${activeSessionForView.organization}-${activeSessionForView.userName}`}
+                session={activeSessionForView}
+                onUpdateSession={handleUpdateSession}
+                onBackToDashboard={() => {
+                  if (activeAppRole.navItems.length > 0) {
+                    setActiveNavId(activeAppRole.navItems[0].id);
+                  }
                 }}
-              >
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 1.25, mb: 1.5 }}>
-                  <Chip
-                    label={activeAppRole.roleTitle}
-                    size="small"
-                    sx={{
-                      bgcolor: activeAppRole.bgTint,
-                      color: activeAppRole.accentColor,
-                      fontWeight: 800,
-                    }}
-                  />
-                  <Chip
-                    label={activeAppRole.routePath}
-                    size="small"
-                    sx={{
-                      bgcolor: '#F1F5F9',
-                      color: '#334155',
-                      fontWeight: 700,
-                      fontFamily: 'var(--font-mono)',
-                    }}
-                  />
-                </Box>
-
-                <Typography variant="h4" sx={{ fontWeight: 800, color: '#0F172A', mb: 1, fontSize: { xs: '22px', md: '28px' } }}>
-                  {activeAppRole.roleTitle} Dashboard Route Ready
-                </Typography>
-                <Typography variant="body2" sx={{ color: '#475569', mb: 3, lineHeight: 1.6 }}>
-                  <strong>Core Workflow:</strong> {activeAppRole.flowSummary}
-                </Typography>
-
-                <Divider sx={{ mb: 3 }} />
-
-                <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 3 }}>
-                  <Box>
-                    <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 800, textTransform: 'uppercase', display: 'block', mb: 1.25 }}>
-                      Role-Filtered Sidebar Sections (Phase 2)
-                    </Typography>
-                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                      {activeAppRole.navItems.map((nav) => (
-                        <Box
-                          key={nav.id}
-                          sx={{
-                            p: 1.25,
-                            px: 1.75,
-                            borderRadius: 2,
-                            bgcolor: '#F8FAFC',
-                            border: '1px solid #E2E8F0',
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                          }}
-                        >
-                          <Typography variant="body2" sx={{ fontWeight: 700, color: '#0F172A' }}>
-                            {nav.label}
-                          </Typography>
-                          <Chip
-                            label={`Module ${nav.moduleRef}`}
-                            size="small"
-                            sx={{ height: 20, fontSize: '10.5px', fontWeight: 700, bgcolor: activeAppRole.bgTint, color: activeAppRole.accentColor }}
-                          />
-                        </Box>
-                      ))}
-                    </Box>
-                  </Box>
-
-                  <Box>
-                    <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 800, textTransform: 'uppercase', display: 'block', mb: 1.25 }}>
-                      Permitted Platform Modules & Quick Role Switcher
-                    </Typography>
-                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75, mb: 3 }}>
-                      {activeAppRole.permittedModules.map((mod) => (
-                        <Chip
-                          key={mod}
-                          label={`Spec ${mod}`}
-                          size="small"
-                          sx={{ bgcolor: '#ECFDF5', color: '#065F46', fontWeight: 700 }}
-                        />
-                      ))}
-                    </Box>
-
-                    <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 800, textTransform: 'uppercase', display: 'block', mb: 1.25 }}>
-                      Test RBAC Route Switching (All 6 Roles)
-                    </Typography>
-                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                      {ROLE_LIST.map((r) => {
-                        const isCurrent = r.roleId === activeAppRole.roleId;
-                        return (
-                          <Button
-                            key={r.roleId}
-                            size="small"
-                            variant={isCurrent ? 'contained' : 'outlined'}
-                            endIcon={!isCurrent ? <ArrowForwardIcon sx={{ fontSize: '13px !important' }} /> : undefined}
-                            onClick={() => handleSwitchRole(r.roleId)}
-                            sx={{
-                              bgcolor: isCurrent ? r.accentColor : '#FFFFFF',
-                              borderColor: isCurrent ? r.accentColor : '#CBD5E1',
-                              color: isCurrent ? '#FFFFFF' : '#334155',
-                              fontWeight: 700,
-                              fontSize: '12px',
-                              borderRadius: 2,
-                            }}
-                          >
-                            {r.shortLabel}
-                          </Button>
-                        );
-                      })}
-                    </Box>
-                  </Box>
-                </Box>
-              </Paper>
-            </Box>
-          </Box>
+                onSignOut={handleSignOut}
+                onNotify={setToastMessage}
+              />
+            ) : currentRoute === 'app-scientist' ? (
+              <ResearchScientistDashboard
+                session={activeSessionForView}
+                activeNavId={activeNavId}
+                searchQuery={workspaceSearch}
+                onSelectNav={setActiveNavId}
+                onNotify={setToastMessage}
+              />
+            ) : currentRoute === 'app-technician' ? (
+              <LabTechnicianDashboard
+                session={activeSessionForView}
+                activeNavId={activeNavId}
+                searchQuery={workspaceSearch}
+                onSelectNav={setActiveNavId}
+                onNotify={setToastMessage}
+              />
+            ) : currentRoute === 'app-clinical' ? (
+              <ClinicalCoordinatorDashboard
+                session={activeSessionForView}
+                activeNavId={activeNavId}
+                searchQuery={workspaceSearch}
+                onSelectNav={setActiveNavId}
+                onNotify={setToastMessage}
+              />
+            ) : currentRoute === 'app-biotech-admin' ? (
+              <BiotechAdminDashboard
+                session={activeSessionForView}
+                activeNavId={activeNavId}
+                searchQuery={workspaceSearch}
+                onSelectNav={setActiveNavId}
+                onNotify={setToastMessage}
+              />
+            ) : currentRoute === 'app-compliance' ? (
+              <ComplianceOfficerDashboard
+                session={activeSessionForView}
+                activeNavId={activeNavId}
+                searchQuery={workspaceSearch}
+                onSelectNav={setActiveNavId}
+                onNotify={setToastMessage}
+              />
+            ) : (
+              <SystemAdminDashboard
+                session={activeSessionForView}
+                activeNavId={activeNavId}
+                searchQuery={workspaceSearch}
+                onSelectNav={setActiveNavId}
+                onNotify={setToastMessage}
+              />
+            )}
+          </DashboardShell>
         ) : (
           <>
             {/* Sticky Public Header */}
             <PublicNavbar
               currentRoute={currentRoute as PublicRoute}
+              session={activeSession}
               onNavigate={(route) => handleNavigate(route)}
               onOpenDemo={() => setDemoModalOpen(true)}
-              onOpenLogin={() => setAuthModalOpen(true)}
+              onOpenLogin={() => handleNavigate('login')}
+              onOpenSignup={() => handleNavigate('signup')}
+              onGoToDashboard={handleGoToDashboard}
+              onOpenProfile={handleOpenProfile}
+              onSignOut={handleSignOut}
             />
 
             {/* Main Public Route Content */}
@@ -462,6 +392,18 @@ export function App() {
               {currentRoute === 'tools' && (
                 <ToolsPage onOpenDemo={() => setDemoModalOpen(true)} />
               )}
+              {currentRoute === 'login' && (
+                <LoginPage
+                  onLoginSuccess={handleLoginSuccess}
+                  onNavigate={(route) => handleNavigate(route)}
+                />
+              )}
+              {currentRoute === 'signup' && (
+                <SignupPage
+                  onSignupSuccess={handleLoginSuccess}
+                  onNavigate={(route) => handleNavigate(route)}
+                />
+              )}
             </Box>
 
             {/* Enterprise Footer */}
@@ -476,12 +418,6 @@ export function App() {
         <DemoBookingModal
           open={demoModalOpen}
           onClose={() => setDemoModalOpen(false)}
-        />
-
-        <AuthModal
-          open={authModalOpen}
-          onClose={() => setAuthModalOpen(false)}
-          onLoginSuccess={handleLoginSuccess}
         />
 
         {/* Feedback Snackbar */}

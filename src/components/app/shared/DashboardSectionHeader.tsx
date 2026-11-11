@@ -60,7 +60,15 @@ export const DashboardSectionHeader: React.FC<DashboardSectionHeaderProps> = ({
         )}
       </Box>
 
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, flexWrap: 'wrap' }}>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1.25,
+          flexWrap: 'wrap',
+          width: { xs: '100%', sm: 'auto' },
+        }}
+      >
         {rightSlot}
         {actionLabel && onAction && (
           <Button

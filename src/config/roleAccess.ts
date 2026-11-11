@@ -16,12 +16,12 @@ export const ROLE_CONFIGS: Record<UserRoleId, RoleConfig> = {
     flowSummary: 'Create Research Project → Conduct Experiments → Analyze Results → Collaborate → Publish Findings',
     permittedModules: ['2.1', '2.2', '2.3', '2.4', '2.5', '2.8', '2.9', '2.11'],
     navItems: [
-      { id: 'overview', label: 'Research Overview', moduleRef: '2.11' },
-      { id: 'projects', label: 'Projects & Milestones', moduleRef: '2.2' },
-      { id: 'eln', label: 'ELN & Experiments', moduleRef: '2.2' },
-      { id: 'datasets', label: 'Biological Data Lake', moduleRef: '2.4' },
-      { id: 'ai-engine', label: 'AI Literature Engine', moduleRef: '2.5' },
-      { id: 'collaboration', label: 'Team Workspaces', moduleRef: '2.8' },
+      { id: 'overview', label: 'Overview', moduleRef: '2.11' },
+      { id: 'projects', label: 'Research Projects', moduleRef: '2.2' },
+      { id: 'eln', label: 'Lab Notebook (ELN)', moduleRef: '2.2' },
+      { id: 'datasets', label: 'Biological Data', moduleRef: '2.4' },
+      { id: 'ai-engine', label: 'AI Assistant', moduleRef: '2.5' },
+      { id: 'collaboration', label: 'Team Workspace', moduleRef: '2.8' },
       { id: 'publications', label: 'Publications & IP', moduleRef: '2.9' },
     ],
   },
@@ -40,11 +40,11 @@ export const ROLE_CONFIGS: Record<UserRoleId, RoleConfig> = {
     flowSummary: 'Register Samples → Conduct Tests → Upload Results → Maintain Equipment Records',
     permittedModules: ['2.1', '2.2', '2.3', '2.4', '2.6'],
     navItems: [
-      { id: 'sample-queue', label: 'Sample Accessioning', moduleRef: '2.3' },
-      { id: 'plate-runs', label: '96-Well Test Queue', moduleRef: '2.3' },
-      { id: 'cryo-storage', label: 'Cryo & Chain of Custody', moduleRef: '2.3' },
-      { id: 'results-upload', label: 'Raw Result Upload', moduleRef: '2.4' },
-      { id: 'equipment', label: 'Equipment & Calibration', moduleRef: '2.6' },
+      { id: 'sample-queue', label: 'Sample Registry', moduleRef: '2.3' },
+      { id: 'plate-runs', label: '96-Well Assays', moduleRef: '2.3' },
+      { id: 'cryo-storage', label: 'Cryo Storage', moduleRef: '2.3' },
+      { id: 'results-upload', label: 'Test Results', moduleRef: '2.4' },
+      { id: 'equipment', label: 'Lab Equipment', moduleRef: '2.6' },
     ],
   },
   'clinical-coordinator': {
@@ -62,11 +62,11 @@ export const ROLE_CONFIGS: Record<UserRoleId, RoleConfig> = {
     flowSummary: 'Create Trial → Recruit Participants → Monitor Trial Progress → Generate Compliance Reports',
     permittedModules: ['2.1', '2.3', '2.4', '2.7', '2.8', '2.10'],
     navItems: [
-      { id: 'trials', label: 'Active Clinical Trials', moduleRef: '2.7' },
-      { id: 'participants', label: 'Recruitment & Consents', moduleRef: '2.7' },
-      { id: 'biospecimens', label: 'Blinded Biospecimens', moduleRef: '2.3' },
-      { id: 'adverse-events', label: 'Adverse Event Log', moduleRef: '2.7' },
-      { id: 'regulatory-exports', label: 'Regulatory Packages', moduleRef: '2.10' },
+      { id: 'trials', label: 'Clinical Trials', moduleRef: '2.7' },
+      { id: 'participants', label: 'Participants', moduleRef: '2.7' },
+      { id: 'biospecimens', label: 'Biospecimens', moduleRef: '2.3' },
+      { id: 'adverse-events', label: 'Adverse Events', moduleRef: '2.7' },
+      { id: 'regulatory-exports', label: 'Regulatory Reports', moduleRef: '2.10' },
     ],
   },
   'biotech-admin': {
@@ -84,11 +84,11 @@ export const ROLE_CONFIGS: Record<UserRoleId, RoleConfig> = {
     flowSummary: 'Manage Research Teams → Monitor Projects → Track Funding → Review Analytics → Ensure Compliance',
     permittedModules: ['2.1', '2.2', '2.6', '2.9', '2.10', '2.11', '2.12'],
     navItems: [
-      { id: 'executive-bi', label: 'Executive Analytics', moduleRef: '2.11' },
-      { id: 'portfolio', label: 'Portfolio & Milestones', moduleRef: '2.2' },
-      { id: 'funding', label: 'Grant & Budget Burn', moduleRef: '2.2' },
-      { id: 'lab-utilization', label: 'Lab Utilization', moduleRef: '2.6' },
-      { id: 'teams-ip', label: 'Teams, IP & Compliance', moduleRef: '2.9' },
+      { id: 'executive-bi', label: 'Executive Overview', moduleRef: '2.11' },
+      { id: 'portfolio', label: 'Research Projects', moduleRef: '2.2' },
+      { id: 'funding', label: 'Grants & Budgets', moduleRef: '2.2' },
+      { id: 'lab-utilization', label: 'Lab Equipment', moduleRef: '2.6' },
+      { id: 'teams-ip', label: 'Teams & IP Records', moduleRef: '2.9' },
     ],
   },
   'compliance-officer': {
@@ -106,11 +106,11 @@ export const ROLE_CONFIGS: Record<UserRoleId, RoleConfig> = {
     flowSummary: 'Review Documentation → Audit Processes → Monitor Compliance → Generate Regulatory Reports',
     permittedModules: ['2.1', '2.3', '2.4', '2.7', '2.9', '2.10', '2.11'],
     navItems: [
-      { id: 'esign-queue', label: '21 CFR Sign-Off Queue', moduleRef: '2.10' },
-      { id: 'audit-trail', label: 'Immutable Audit Trail', moduleRef: '2.3' },
-      { id: 'sop-control', label: 'SOP & Doc Control', moduleRef: '2.10' },
-      { id: 'capa-deviations', label: 'CAPA & Calibrations', moduleRef: '2.6' },
-      { id: 'reg-reports', label: 'FDA / ISO Reports', moduleRef: '2.10' },
+      { id: 'esign-queue', label: 'E-Signatures', moduleRef: '2.10' },
+      { id: 'audit-trail', label: 'Audit Trail', moduleRef: '2.3' },
+      { id: 'sop-control', label: 'SOP Documents', moduleRef: '2.10' },
+      { id: 'capa-deviations', label: 'CAPA & Deviations', moduleRef: '2.6' },
+      { id: 'reg-reports', label: 'Regulatory Reports', moduleRef: '2.10' },
     ],
   },
   'system-admin': {
@@ -128,11 +128,12 @@ export const ROLE_CONFIGS: Record<UserRoleId, RoleConfig> = {
     flowSummary: 'Manage Users → Configure Security → Monitor Infrastructure → Maintain Platform Operations',
     permittedModules: ['2.1', '2.4', '2.6', '2.10', '2.12'],
     navItems: [
-      { id: 'users-rbac', label: 'Users & RBAC Policies', moduleRef: '2.12' },
-      { id: 'security-sso', label: 'SSO, 2FA & Security', moduleRef: '2.1' },
-      { id: 'infrastructure', label: 'Data Lake & Infrastructure', moduleRef: '2.4' },
-      { id: 'iot-gateways', label: 'IoT Device Gateways', moduleRef: '2.6' },
-      { id: 'subscriptions', label: 'Subscriptions & Logs', moduleRef: '2.12' },
+      { id: 'overview', label: 'System Overview', moduleRef: '2.12' },
+      { id: 'users', label: 'Users & Roles', moduleRef: '2.12' },
+      { id: 'organizations', label: 'Organizations', moduleRef: '2.1' },
+      { id: 'security', label: 'Security & SSO', moduleRef: '2.1' },
+      { id: 'iot-devices', label: 'IoT & Infrastructure', moduleRef: '2.6' },
+      { id: 'billing', label: 'Billing & System Logs', moduleRef: '2.12' },
     ],
   },
 };
@@ -144,6 +145,17 @@ export const getRoleConfig = (roleId: UserRoleId): RoleConfig =>
 
 export const getRoleByAppRoute = (route: AppRoute): RoleConfig | undefined =>
   ROLE_LIST.find((cfg) => cfg.routeKey === route);
+
+export const getUserInitials = (name: string): string => {
+  const cleaned = name
+    .split(',')[0]
+    .replace(/\b(Dr|Prof|Mr|Mrs|Ms)\.?\s+/gi, '')
+    .trim();
+  const parts = cleaned.split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return 'GB';
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
+};
 
 export const createDefaultSessionForRole = (
   roleId: UserRoleId,

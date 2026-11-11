@@ -47,7 +47,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onOpenDemo, onNavigate }) =>
         <Box component="section" id="solutions-by-industry-section">
           <HomeSolutionsTabs
             onOpenDemo={onOpenDemo}
-            onNavigateSolutions={() => onNavigate('solutions')}
+            onNavigateSolutions={() => onNavigate('tailored-solutions')}
           />
         </Box>
 

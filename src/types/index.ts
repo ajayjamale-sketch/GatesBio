@@ -92,11 +92,17 @@ export interface PricingPlan {
   badge?: string;
 }
 
+import type { AppRoute } from './dashboard';
+export type { AppRoute, UserRoleId, DashboardSession } from './dashboard';
+
 export type PublicRoute =
   | 'home'
   | 'platform'
-  | 'solutions'
+  | 'tailored-solutions'
+  | 'resources'
   | 'compliance'
   | 'pricing'
   | 'tools'
   | 'demo';
+
+export type AnyRoute = PublicRoute | AppRoute;

@@ -387,7 +387,16 @@ export function App() {
                 />
               )}
               {currentRoute === 'pricing' && (
-                <PricingPage onOpenDemo={() => setDemoModalOpen(true)} />
+                <PricingPage
+                  session={activeSession}
+                  onOpenDemo={() => setDemoModalOpen(true)}
+                  onRequireLogin={() => {
+                    handleNavigate('login');
+                    setToastMessage('Please sign in to proceed with subscription checkout.');
+                  }}
+                  onPaymentSuccess={(message) => setToastMessage(message)}
+                  onGoToDashboard={handleGoToDashboard}
+                />
               )}
               {currentRoute === 'tools' && (
                 <ToolsPage onOpenDemo={() => setDemoModalOpen(true)} />
@@ -406,11 +415,13 @@ export function App() {
               )}
             </Box>
 
-            {/* Enterprise Footer */}
-            <PublicFooter
-              onNavigate={(route) => handleNavigate(route)}
-              onOpenDemo={() => setDemoModalOpen(true)}
-            />
+            {/* Enterprise Footer (omitted on authentication pages) */}
+            {currentRoute !== 'login' && currentRoute !== 'signup' && (
+              <PublicFooter
+                onNavigate={(route) => handleNavigate(route)}
+                onOpenDemo={() => setDemoModalOpen(true)}
+              />
+            )}
           </>
         )}
 

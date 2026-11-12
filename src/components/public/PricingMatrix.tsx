@@ -14,12 +14,19 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import StarIcon from '@mui/icons-material/Star';
 import { PRICING_PLANS } from '../../data/mockData';
+import type { PricingPlan } from '../../types';
 
 interface PricingMatrixProps {
   onOpenDemo: () => void;
+  onSelectPlan?: (plan: PricingPlan, annualBilling: boolean, seats: number) => void;
+  isLoggedIn?: boolean;
 }
 
-export const PricingMatrix: React.FC<PricingMatrixProps> = ({ onOpenDemo }) => {
+export const PricingMatrix: React.FC<PricingMatrixProps> = ({
+  onOpenDemo,
+  onSelectPlan,
+  isLoggedIn = false,
+}) => {
   const [annualBilling, setAnnualBilling] = useState(true);
   const [teamSize, setTeamSize] = useState<number>(12);
 
@@ -188,25 +195,41 @@ export const PricingMatrix: React.FC<PricingMatrixProps> = ({ onOpenDemo }) => {
                 </Box>
               </div>
 
-              <Button
-                variant={plan.popular ? 'contained' : 'outlined'}
-                onClick={onOpenDemo}
-                fullWidth
-                size="large"
-                sx={{
-                  py: 1.4,
-                  fontWeight: 700,
-                  bgcolor: plan.popular ? '#1E40AF' : 'transparent',
-                  borderColor: plan.popular ? '#1E40AF' : '#CBD5E1',
-                  color: plan.popular ? '#FFFFFF' : '#0F172A',
-                  '&:hover': {
-                    bgcolor: plan.popular ? '#1E3A8A' : '#F8FAFC',
-                    borderColor: '#1E40AF',
-                  },
-                }}
-              >
-                {plan.ctaText}
-              </Button>
+              <Box>
+                <Button
+                  variant={plan.popular ? 'contained' : 'outlined'}
+                  onClick={() => (onSelectPlan ? onSelectPlan(plan, annualBilling, teamSize) : onOpenDemo())}
+                  fullWidth
+                  size="large"
+                  sx={{
+                    py: 1.4,
+                    fontWeight: 700,
+                    borderRadius: '6px',
+                    bgcolor: plan.popular ? '#1E40AF' : 'transparent',
+                    borderColor: plan.popular ? '#1E40AF' : '#CBD5E1',
+                    color: plan.popular ? '#FFFFFF' : '#0F172A',
+                    '&:hover': {
+                      bgcolor: plan.popular ? '#1E3A8A' : '#F8FAFC',
+                      borderColor: '#1E40AF',
+                    },
+                  }}
+                >
+                  {isLoggedIn ? `Proceed with ${plan.name}` : plan.ctaText}
+                </Button>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    display: 'block',
+                    textAlign: 'center',
+                    mt: 1,
+                    color: isLoggedIn ? '#1E40AF' : '#64748B',
+                    fontWeight: 600,
+                    fontSize: '11.5px',
+                  }}
+                >
+                  {isLoggedIn ? 'Instant billing checkout enabled' : 'Sign in required to proceed to payment'}
+                </Typography>
+              </Box>
             </Paper>
           );
         })}
